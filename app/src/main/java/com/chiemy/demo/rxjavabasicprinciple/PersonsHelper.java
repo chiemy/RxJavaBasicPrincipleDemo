@@ -22,32 +22,14 @@ public class PersonsHelper {
             }
         });
 
-        AsyncJob<Boolean> resultJob = new AsyncJob<Boolean>() {
+        AsyncJob<Boolean> resultJob = filterPersonJob.flatmap(new Func<Person, AsyncJob<Boolean>>(){
+
             @Override
-            public void start(final Callback<Boolean> callback) {
-                filterPersonJob.start(new Callback<Person>() {
-                    @Override
-                    public void onResult(Person result) {
-                        api.addFirend(result).start(new Callback<Boolean>() {
-                            @Override
-                            public void onResult(Boolean result) {
-                                callback.onResult(result);
-                            }
-
-                            @Override
-                            public void onError(Exception e) {
-                                callback.onError(e);
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        callback.onError(e);
-                    }
-                });
+            public AsyncJob<Boolean> call(Person person) {
+                return api.addFirend(person);
             }
-        };
+        });
+
         return resultJob;
     }
 
