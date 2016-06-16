@@ -12,19 +12,25 @@ import java.util.List;
 public class PersonsHelper {
     private ApiWrapper api;
 
-    public void addFriends(final String name, final Callback<Boolean> callback){
-        api.queryPerson(new Callback<List<Person>>() {
+    public AsyncJob<Boolean> addFriends(final String name){
+        return new AsyncJob<Boolean>() {
             @Override
-            public void onResult(List<Person> result) {
-                Person person = filterPerson(result, name);
-                api.addFirend(person, callback);
-            }
+            public void start(final Callback<Boolean> callback) {
+                AsyncJob<List<Person>> queryJob = api.queryPerson();
+                queryJob.start(new Callback<List<Person>>() {
+                    @Override
+                    public void onResult(List<Person> result) {
+                        Person person = filterPerson(result, name);
+                        api.addFirend(person).start(callback);
+                    }
 
-            @Override
-            public void onError(Exception e) {
-                callback.onError(e);
+                    @Override
+                    public void onError(Exception e) {
+                        callback.onError(e);
+                    }
+                });
             }
-        });
+        };
     }
 
     private Person filterPerson(List<Person> persons, String name){

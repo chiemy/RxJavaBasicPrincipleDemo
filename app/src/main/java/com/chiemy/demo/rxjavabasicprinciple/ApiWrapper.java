@@ -10,32 +10,42 @@ import java.util.List;
 public class ApiWrapper {
     private Api api;
 
-    void queryPerson(final Callback<List<Person>> callback){
-        api.queryPerson(new Api.PersonQueryCallback(){
-
+    AsyncJob<List<Person>> queryPerson(){
+        return new AsyncJob<List<Person>>() {
             @Override
-            public void onPersonsReceived(List<Person> persons) {
-                callback.onResult(persons);
-            }
+            public void start(final Callback<List<Person>> callback) {
+                api.queryPerson(new Api.PersonQueryCallback(){
 
-            @Override
-            public void onError(Exception e) {
-                callback.onError(e);
+                    @Override
+                    public void onPersonsReceived(List<Person> persons) {
+                        callback.onResult(persons);
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        callback.onError(e);
+                    }
+                });
             }
-        });
+        };
     }
 
-    void addFirend(Person person, final Callback<Boolean> callback){
-        api.addFirend(person, new Api.AddFriendResultCallback() {
+    AsyncJob<Boolean> addFirend(final Person person){
+        return new AsyncJob<Boolean>() {
             @Override
-            public void onAddResult(Result result) {
-                callback.onResult(result.isSuccess());
-            }
+            public void start(final Callback<Boolean> callback) {
+                api.addFirend(person, new Api.AddFriendResultCallback() {
+                    @Override
+                    public void onAddResult(Result result) {
+                        callback.onResult(result.isSuccess());
+                    }
 
-            @Override
-            public void onError(Exception e) {
-                callback.onError(e);
+                    @Override
+                    public void onError(Exception e) {
+                        callback.onError(e);
+                    }
+                });
             }
-        });
+        };
     }
 }
