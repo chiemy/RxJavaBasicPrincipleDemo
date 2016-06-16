@@ -13,15 +13,14 @@ public class PersonsHelper {
     private ApiWrapper api;
 
     public AsyncJob<Boolean> addFriends(final String name){
-        return new AsyncJob<Boolean>() {
+        final AsyncJob<List<Person>> queryJob = api.queryPerson();
+        final AsyncJob<Person> filterPersonJob = new AsyncJob<Person>() {
             @Override
-            public void start(final Callback<Boolean> callback) {
-                AsyncJob<List<Person>> queryJob = api.queryPerson();
+            public void start(final Callback<Person> callback) {
                 queryJob.start(new Callback<List<Person>>() {
                     @Override
                     public void onResult(List<Person> result) {
-                        Person person = filterPerson(result, name);
-                        api.addFirend(person).start(callback);
+                        callback.onResult(filterPerson(result, name));
                     }
 
                     @Override
@@ -31,6 +30,34 @@ public class PersonsHelper {
                 });
             }
         };
+
+        AsyncJob<Boolean> resultJob = new AsyncJob<Boolean>() {
+            @Override
+            public void start(final Callback<Boolean> callback) {
+                filterPersonJob.start(new Callback<Person>() {
+                    @Override
+                    public void onResult(Person result) {
+                        api.addFirend(result).start(new Callback<Boolean>() {
+                            @Override
+                            public void onResult(Boolean result) {
+                                callback.onResult(result);
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                callback.onError(e);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+
+                    }
+                });
+            }
+        };
+        return resultJob;
     }
 
     private Person filterPerson(List<Person> persons, String name){
