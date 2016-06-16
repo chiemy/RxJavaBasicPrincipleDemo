@@ -9,7 +9,20 @@ import java.util.List;
  */
 public interface Api {
 
-    List<Person> queryPerson();
+    interface PersonQueryCallback {
 
-    Result addFirend(Person person);
+        void onPersonsReceived(List<Person> persons);
+
+        void onError(Exception e);
+    }
+
+    interface AddFriendResultCallback{
+        void onAddResult(Result result);
+
+        void onError(Exception e);
+    }
+
+    void queryPerson(PersonQueryCallback callback);
+
+    void addFirend(Person person, AddFriendResultCallback callback);
 }
