@@ -14,22 +14,13 @@ public class PersonsHelper {
 
     public AsyncJob<Boolean> addFriends(final String name){
         final AsyncJob<List<Person>> queryJob = api.queryPerson();
-        final AsyncJob<Person> filterPersonJob = new AsyncJob<Person>() {
-            @Override
-            public void start(final Callback<Person> callback) {
-                queryJob.start(new Callback<List<Person>>() {
-                    @Override
-                    public void onResult(List<Person> result) {
-                        callback.onResult(filterPerson(result, name));
-                    }
+        final AsyncJob<Person> filterPersonJob = queryJob.map(new Func<List<Person>, Person>() {
 
-                    @Override
-                    public void onError(Exception e) {
-                        callback.onError(e);
-                    }
-                });
+            @Override
+            public Person call(List<Person> persons) {
+                return filterPerson(persons, name);
             }
-        };
+        });
 
         AsyncJob<Boolean> resultJob = new AsyncJob<Boolean>() {
             @Override
@@ -52,7 +43,7 @@ public class PersonsHelper {
 
                     @Override
                     public void onError(Exception e) {
-
+                        callback.onError(e);
                     }
                 });
             }
