@@ -12,6 +12,10 @@ import java.util.List;
 public class PersonsHelper {
     private ApiWrapper api;
 
+    public PersonsHelper(){
+        api = new ApiWrapper();
+    }
+
     public AsyncJob<Boolean> addFriends(final String name){
         final AsyncJob<List<Person>> queryJob = api.queryPerson();
         final AsyncJob<Person> filterPersonJob = queryJob.map(new Func<List<Person>, Person>() {

@@ -8,6 +8,10 @@ package com.chiemy.demo.rxjavabasicprinciple;
 public class Result {
     private boolean success;
 
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
     public boolean isSuccess() {
         return success;
     }

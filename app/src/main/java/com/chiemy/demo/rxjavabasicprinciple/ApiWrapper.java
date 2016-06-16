@@ -1,5 +1,6 @@
 package com.chiemy.demo.rxjavabasicprinciple;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -9,6 +10,39 @@ import java.util.List;
  */
 public class ApiWrapper {
     private Api api;
+
+    public ApiWrapper(){
+        // 测试
+        api = new Api() {
+            @Override
+            public void queryPerson(PersonQueryCallback callback) {
+                List<Person> persons = new ArrayList<>();
+                for (int i = 0 ; i < 3 ; i++){
+                    Person person = new Person();
+                    person.setName(i + "");
+                    person.setAge(i);
+                    persons.add(person);
+                }
+                callback.onPersonsReceived(persons);
+            }
+
+            @Override
+            public void addFirend(Person person, AddFriendResultCallback callback) {
+                if (person == null) {
+                    callback.onError(new Exception("参数为null"));
+                    return;
+                }
+                String name = person.getName();
+                Result result = new Result();
+                if (Integer.parseInt(name) >= 0 && Integer.parseInt(name) < 3) {
+                    result.setSuccess(true);
+                } else {
+                    result.setSuccess(false);
+                }
+                callback.onAddResult(result);
+            }
+        };
+    }
 
     AsyncJob<List<Person>> queryPerson(){
         return new AsyncJob<List<Person>>() {
