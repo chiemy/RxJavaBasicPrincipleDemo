@@ -12,10 +12,10 @@ import java.util.List;
 public class PersonsHelper {
     private Api api;
 
-    public Result addFriends(final String name){
+    public boolean addFriends(final String name){
         List<Person> persons = api.queryPerson();
         Person person = filterPerson(persons, name);
-        return api.addFirend(person);
+        return api.addFirend(person).isSuccess();
     }
 
     private Person filterPerson(List<Person> persons, String name){
